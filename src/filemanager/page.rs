@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Result};
 use std::vec;
 
-trait New<T> {
+pub trait New<T> {
     fn new(c: T) -> Page;
 }
 
@@ -22,7 +22,7 @@ impl New<Vec<u8>> for Page {
         Page { bb: b }
     }
 }
-// [0x01, 0x02, 0x03, 0x04, 0x05, 0x06]
+
 impl Page {
     pub fn get_i32(&self, offset: usize) -> Result<i32> {
         if offset + 4 - 1 < self.bb.len() {

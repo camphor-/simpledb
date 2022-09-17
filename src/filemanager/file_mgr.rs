@@ -1,6 +1,7 @@
 use anyhow::{anyhow, Error, Result};
 use std::collections::HashMap;
-use std::fs::{self, File};
+use std::fs::{self, File, OpenOptions};
+use std::ops::Deref;
 use std::os::unix::prelude::FileExt;
 use std::path::Path;
 
@@ -40,26 +41,29 @@ impl FileMgr {
     }
 
     pub fn read(&mut self, blk: &BlockId, p: &mut Page) -> Result<()> {
+        let blocksize = self.block_size();
         let f = self.get_file(&blk.filename())?;
-        f.read_at(p.contents().as_mut_slice(), blk.number() * self.blocksize as u64)?;
+        f.read_at(p.contents().as_mut_slice(), blk.number() * blocksize as u64)?;
         Ok(())
     }
 
     // メモ: p.contents を mutable で持ちたくない
     pub fn write(&mut self, blk: &BlockId, p: &mut Page) -> Result<()> {
+        let blocksize = self.block_size();
         let f = self.get_file(&blk.filename())?;
-        f.write_at(p.contents().as_slice(), blk.number() * self.blocksize as u64)?;
+        f.write_at(p.contents().as_slice(), blk.number() * blocksize as u64)?;
         Ok(())
     }
 
     pub fn append(&mut self, filename: &String) -> Result<BlockId> {
         let newblknum = self.length(filename)?;
         let blk = BlockId::new(filename.clone(), newblknum);
+        let blocksize = self.block_size();
 
         let v = vec![0; self.blocksize];
         let b = v.as_slice();
         let f = self.get_file(&blk.filename())?;
-        f.write_at(b, newblknum * self.blocksize as u64)?;
+        f.write_at(b, newblknum * blocksize as u64)?;
 
         Ok(blk)
     }
@@ -83,9 +87,14 @@ impl FileMgr {
         } else {
             let file_name = format!("{}/{}", self.db_directory, file_name);
             let path = Path::new(&file_name);
-            let db_table = File::open(&path)?;
-            if let Some(f) = self.open_files.insert(file_name, db_table) {
-                return Ok(f.try_clone().unwrap());
+            let f = OpenOptions::new()
+                .read(true)
+                .write(true)
+                .create(true)
+                .open(&path)?;
+            self.open_files.insert(file_name.clone(), f);
+            if let Some(f) = self.open_files.get(&file_name) {
+                return Ok(f.try_clone()?);
             }
         }
 
