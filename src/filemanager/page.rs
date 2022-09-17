@@ -79,8 +79,8 @@ impl Page {
         self.set_bytes(offset, bytes)
     }
 
-    pub fn contents(&self) -> &Vec<u8> {
-        &self.bb
+    pub fn contents(&mut self) -> &mut Vec<u8> {
+        &mut self.bb
     }
 
     pub fn max_length(strlen: usize) -> usize {

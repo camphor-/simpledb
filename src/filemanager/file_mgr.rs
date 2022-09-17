@@ -1,6 +1,7 @@
 use anyhow::{anyhow, Error, Result};
 use std::collections::HashMap;
 use std::fs::{self, File};
+use std::os::unix::prelude::FileExt;
 use std::path::Path;
 
 use super::block_id::BlockId;
@@ -38,8 +39,45 @@ impl FileMgr {
         })
     }
 
-    fn get_file(&mut self, file_name: String) -> Result<File> {
-        let f = self.open_files.get(&file_name);
+    pub fn read(&mut self, blk: &BlockId, p: &mut Page) -> Result<()> {
+        let f = self.get_file(&blk.filename())?;
+        f.read_at(p.contents().as_mut_slice(), blk.number() * self.blocksize as u64)?;
+        Ok(())
+    }
+
+    // メモ: p.contents を mutable で持ちたくない
+    pub fn write(&mut self, blk: &BlockId, p: &mut Page) -> Result<()> {
+        let f = self.get_file(&blk.filename())?;
+        f.write_at(p.contents().as_slice(), blk.number() * self.blocksize as u64)?;
+        Ok(())
+    }
+
+    pub fn append(&mut self, filename: &String) -> Result<BlockId> {
+        let newblknum = self.length(filename)?;
+        let blk = BlockId::new(filename.clone(), newblknum);
+
+        let v = vec![0; self.blocksize];
+        let b = v.as_slice();
+        let f = self.get_file(&blk.filename())?;
+        f.write_at(b, newblknum * self.blocksize as u64)?;
+
+        Ok(blk)
+    }
+
+    pub fn length(&self, filename: &String) -> Result<u64> {
+        Ok(fs::metadata(filename)?.len() as u64)
+    }
+
+    pub fn is_new(&self) -> bool {
+        self.is_new 
+    }
+
+    pub fn block_size(&self) -> usize {
+        self.blocksize
+    }
+
+    fn get_file(&mut self, file_name: &String) -> Result<File> {
+        let f = self.open_files.get(file_name);
         if let Some(f) = f {
             return Ok(f.try_clone()?);
         } else {
