@@ -27,4 +27,6 @@ fn filenamager_test() {
 
     assert_eq!(p2.get_string(pos1).unwrap(), "abcdefghijklm".to_string());
     assert_eq!(p2.get_i32(pos2).unwrap(), 345);
+
+    fs::remove_dir_all("testdata").unwrap();
 }
