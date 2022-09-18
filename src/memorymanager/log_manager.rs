@@ -1,20 +1,21 @@
-use anyhow::{Result};
+use anyhow::Result;
 
-use std::borrow::Borrow;
-use std::rc::Rc;
-use std::cell::RefCell;
-use crate::filemanager::block_id::BlockId;
 use super::super::filemanager::page::{New, Page};
+use super::log_iterator::LogIterator;
+use crate::filemanager::block_id::BlockId;
+use std::borrow::Borrow;
+use std::cell::RefCell;
+use std::rc::Rc;
 
 use super::super::filemanager::file_mgr::FileMgr;
 
-pub struct LogMgr{
+pub struct LogMgr {
     fm: RefCell<FileMgr>,
     logfile: String,
     logpage: Page,
     currentblk: BlockId,
     latestLSN: i32,
-    lastSaveLSN: i32,
+    lastSavedLSN: i32,
 }
 
 impl LogMgr {
@@ -36,17 +37,49 @@ impl LogMgr {
             logpage,
             currentblk,
             latestLSN: 0,
-            lastSaveLSN: 0,
+            lastSavedLSN: 0,
         })
     }
 
-    pub fn append(&self, rec: Vec<u8>) -> Result<u32> {
-        Ok(0)
+    pub fn iterator(&self) -> Result<LogIterator> {
+        self.private_flush();
+        LogIterator::new(self.fm, RefCell::from(self.currentblk))
     }
 
-    pub fn flush(&self, lsn: u32) -> Result<()> {
-        Ok(())
+    pub fn append(&self, logrec: Vec<u8>) -> Result<i32> {
+        let mut boundary = self.logpage.get_i32(0)?;
+        let recsize = logrec.len();
+        let bytesneeded = recsize + 4;
+        if boundary - (bytesneeded as i32) < 4 {
+            self.private_flush();
+            self.currentblk = self.appendNewBlock()?;
+            boundary = self.logpage.get_i32(0)?;
+        }
+        let recpos = (boundary as usize) - bytesneeded;
+        self.logpage.set_bytes(recpos, logrec);
+        self.logpage.set_i32(0, recpos as i32);
+        self.latestLSN += 1;
+        Ok(self.latestLSN)
     }
 
-    // pub fn iterator
+    fn appendNewBlock(&self) -> Result<BlockId> {
+        let blk = self.fm.borrow().append(&self.logfile)?;
+        self.logpage
+            .set_i32(0, self.fm.borrow().block_size() as i32);
+        self.fm.borrow().write(&self.currentblk, &mut &self.logpage);
+        Ok(blk)
+    }
+
+    pub fn flush(&self, lsn: i32) {
+        if lsn >= self.lastSavedLSN {
+            self.private_flush();
+        }
+    }
+
+    fn private_flush(&self) {
+        self.fm
+            .borrow_mut()
+            .write(&self.currentblk, &mut self.logpage);
+        self.lastSavedLSN = self.latestLSN;
+    }
 }
