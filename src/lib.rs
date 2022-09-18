@@ -1,5 +1,7 @@
 pub mod filemanager;
 
+pub mod memorymanager;
+
 #[cfg(test)]
 mod tests {
     #[test]
