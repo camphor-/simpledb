@@ -1,18 +1,20 @@
-use simpledb::{memorymanager::log_manager::LogMgr, filemanager::file_mgr::FileMgr};
-use simpledb::{filemanager::page::{Page, New}};
+use simpledb::filemanager::page::{New, Page};
+use simpledb::{filemanager::file_mgr::FileMgr, memorymanager::log_manager::LogMgr};
+
+use std::cell::RefCell;
 
 extern crate simpledb;
 
 #[test]
 pub fn log_mananger_test() {
     let fm = FileMgr::new("testdata", 400).unwrap();
-    let lm = LogMgr::new(fm, "log_manager_test");
+    let mut lm = LogMgr::new(RefCell::from(fm), "log_manager_test").unwrap();
 
-    append_records(&lm, 1, 70);
+    append_records(&mut lm, 1, 70);
     lm.flush(70).unwrap();
 }
 
-fn append_records(lm: &LogMgr, start: i32, end: i32) {
+fn append_records(lm: &mut LogMgr, start: i32, end: i32) {
     for i in start..=end {
         let rec = create_record(format!("record{}", i), i);
         lm.append(rec).unwrap();
