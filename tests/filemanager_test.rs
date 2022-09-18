@@ -1,11 +1,14 @@
 extern crate simpledb;
 
+use simpledb::SimpleDB;
 use simpledb::filemanager::block_id::{BlockId};
 use simpledb::filemanager::file_mgr::{FileMgr};
 use simpledb::filemanager::page::{Page, New};
 
 #[test]
 fn filenamager_test() {
+    // TODO: SimpleDB を使う
+
     let mut file_mgr = FileMgr::new("testdata", 1024).unwrap();
 
     let filename = "filemanager_test".to_string();
