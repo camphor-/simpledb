@@ -4,7 +4,6 @@ use super::super::filemanager::page::{New, Page};
 use anyhow::{anyhow, Error, Result};
 
 use std::cell::RefCell;
-use std::rc::Rc;
 
 pub struct LogIterator {
     fm: RefCell<FileMgr>,
@@ -18,9 +17,9 @@ impl LogIterator {
     pub fn new(fm: RefCell<FileMgr>, blk: RefCell<BlockId>) -> Result<Self> {
         let p = Page::new(fm.borrow().block_size());
         let mut logIter = LogIterator {
-            fm: fm,
-            blk: blk,
-            p: p,
+            fm,
+            blk,
+            p,
             currentpos: 0,
             boundary: 0,
         };
