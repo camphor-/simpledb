@@ -9,11 +9,11 @@ impl LogMgr {
         LogMgr {  }
     }
 
-    pub fn append(rec: Vec<u8>) -> Result<u32> {
+    pub fn append(&self, rec: Vec<u8>) -> Result<u32> {
         Ok(0)
     }
 
-    pub fn flush(lsn: u32) -> Result<()> {
+    pub fn flush(&self, lsn: u32) -> Result<()> {
         Ok(())
     }
 
