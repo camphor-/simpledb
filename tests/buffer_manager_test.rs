@@ -1,5 +1,5 @@
-use simpledb::SimpleDB;
 use simpledb::filemanager::block_id::BlockId;
+use simpledb::SimpleDB;
 
 fn buffermgrtest() {
     let mut db = SimpleDB::new("testdata", 400, 3).unwrap();
@@ -7,20 +7,40 @@ fn buffermgrtest() {
     bm.set_max_time(1);
 
     let mut buff = Vec::with_capacity(6);
-    buff.push(bm.pin(&BlockId::new("buffer_manager_test".to_string(), 0)).unwrap());
-    buff.push(bm.pin(&BlockId::new("buffer_manager_test".to_string(), 1)).unwrap());
-    buff.push(bm.pin(&BlockId::new("buffer_manager_test".to_string(), 2)).unwrap());
+    buff.push(
+        bm.pin(&BlockId::new("buffer_manager_test".to_string(), 0))
+            .unwrap(),
+    );
+    buff.push(
+        bm.pin(&BlockId::new("buffer_manager_test".to_string(), 1))
+            .unwrap(),
+    );
+    buff.push(
+        bm.pin(&BlockId::new("buffer_manager_test".to_string(), 2))
+            .unwrap(),
+    );
     bm.unpin(buff[1]);
     buff[1] = 10;
-    buff.push(bm.pin(&BlockId::new("buffer_manager_test".to_string(), 0)).unwrap());
-    buff.push(bm.pin(&BlockId::new("buffer_manager_test".to_string(), 1)).unwrap());
+    buff.push(
+        bm.pin(&BlockId::new("buffer_manager_test".to_string(), 0))
+            .unwrap(),
+    );
+    buff.push(
+        bm.pin(&BlockId::new("buffer_manager_test".to_string(), 1))
+            .unwrap(),
+    );
     assert_eq!(0, bm.available());
 
-    assert!(bm.pin(&BlockId::new("buffer_manager_test".to_string(), 3)).is_err());
+    assert!(bm
+        .pin(&BlockId::new("buffer_manager_test".to_string(), 3))
+        .is_err());
 
     bm.unpin(buff[2]);
     buff[2] = 10;
-    buff.push(bm.pin(&BlockId::new("buffer_manager_test".to_string(), 3)).unwrap());
+    buff.push(
+        bm.pin(&BlockId::new("buffer_manager_test".to_string(), 3))
+            .unwrap(),
+    );
 
     let exp = HashMap::from([
         (0, BlockId::new("buffer_manager_test".to_string(), 0)),

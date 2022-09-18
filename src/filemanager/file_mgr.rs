@@ -51,7 +51,10 @@ impl FileMgr {
     pub fn write(&mut self, blk: &BlockId, p: &mut Page) -> Result<()> {
         let blocksize = self.block_size();
         let f = self.get_file(&blk.filename())?;
-        f.write_at(p.contents().as_slice(), blk.number() * blocksize as u64)?;
+        f.write_at(
+            p.contents().clone().as_slice(),
+            blk.number() * blocksize as u64,
+        )?;
         Ok(())
     }
 
@@ -73,7 +76,7 @@ impl FileMgr {
     }
 
     pub fn is_new(&self) -> bool {
-        self.is_new 
+        self.is_new
     }
 
     pub fn block_size(&self) -> usize {

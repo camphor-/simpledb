@@ -1,7 +1,7 @@
+use simpledb::filemanager::page::{New, Page};
+use simpledb::memorymanager::buffer_manager::BufferMgr;
 use simpledb::SimpleDB;
-use simpledb::{memorymanager::log_manager::LogMgr, filemanager::file_mgr::FileMgr};
-use simpledb::{filemanager::page::{Page, New}};
-use simpledb::{memorymanager::buffer_manager::BufferMgr};
+use simpledb::{filemanager::file_mgr::FileMgr, memorymanager::log_manager::LogMgr};
 
 pub fn buffer_test() {
     let mut db = SimpleDB::new("testdata", 400, 3).unwrap();
