@@ -52,9 +52,9 @@ impl BufferMgr {
         }
     }
 
-    pub fn unpin(&mut self, buff: &mut Buffer) -> Result<()> {
-        buff.unpin();
-        if buff.is_pinned() {
+    pub fn unpin(&mut self, buff: Rc<RefCell<Buffer>>) -> Result<()> {
+        buff.borrow_mut().unpin();
+        if buff.borrow().is_pinned() {
             self.num_available += 1;
         }
         Ok(())

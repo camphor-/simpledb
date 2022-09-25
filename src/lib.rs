@@ -1,7 +1,6 @@
 use anyhow::Result;
 use filemanager::file_mgr::FileMgr;
 use memorymanager::{buffer_manager::BufferMgr, log_manager::LogMgr};
-use std::borrow::Borrow;
 use std::cell::RefCell;
 use std::rc::Rc;
 

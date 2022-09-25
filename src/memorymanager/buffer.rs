@@ -29,8 +29,8 @@ impl Buffer {
     }
 
     // TODO: &mut Page を返した方が良さそう
-    pub fn contents(&self) -> &Page {
-        &self.page
+    pub fn contents(&mut self) -> &mut Page {
+        &mut self.page
     }
 
     // TODO: &BlockId を返した方が良さそう

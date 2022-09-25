@@ -1,5 +1,7 @@
 use simpledb::filemanager::block_id::BlockId;
 use simpledb::SimpleDB;
+use std::collections::HashMap;
+use std::fs;
 
 fn buffermgrtest() {
     let mut db = SimpleDB::new("testdata", 400, 3).unwrap();

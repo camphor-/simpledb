@@ -1,7 +1,6 @@
 use anyhow::{anyhow, Error, Result};
 use std::collections::HashMap;
 use std::fs::{self, File, OpenOptions};
-use std::ops::Deref;
 use std::os::unix::prelude::FileExt;
 use std::path::Path;
 
