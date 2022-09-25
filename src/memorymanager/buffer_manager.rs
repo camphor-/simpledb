@@ -24,7 +24,7 @@ pub struct BufferMgr {
 }
 
 impl BufferMgr {
-    pub fn new(fm: Rc<RefCell<FileMgr>>, lm: Rc<LogMgr>, numbuffs: usize) -> Self {
+    pub fn new(fm: Rc<RefCell<FileMgr>>, lm: Rc<RefCell<LogMgr>>, numbuffs: usize) -> Self {
         let mut bufferpool = Vec::with_capacity(numbuffs);
 
         for _ in 0..numbuffs {

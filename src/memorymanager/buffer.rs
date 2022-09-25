@@ -12,11 +12,11 @@ pub struct Buffer {
     lsn: i32,
     block_id: Option<BlockId>,
     fm: Rc<RefCell<FileMgr>>,
-    lm: Rc<LogMgr>,
+    lm: Rc<RefCell<LogMgr>>,
 }
 
 impl Buffer {
-    pub fn new(fm: Rc<RefCell<FileMgr>>, lm: Rc<LogMgr>) -> Buffer {
+    pub fn new(fm: Rc<RefCell<FileMgr>>, lm: Rc<RefCell<LogMgr>>) -> Buffer {
         Buffer {
             is_pinned: false,
             page: Page::new(fm.borrow().block_size()),
@@ -60,7 +60,7 @@ impl Buffer {
     pub fn flush(&mut self) {
         if let Some(v) = self.block_id.clone() {
             if self.txnum > 0 {
-                self.lm.flush(self.lsn);
+                self.lm.borrow_mut().flush(self.lsn);
                 self.fm.borrow_mut().write(&v, &mut self.page);
             }
         }

@@ -18,7 +18,7 @@ pub struct LogMgr {
 }
 
 impl LogMgr {
-    pub fn new(fm: RefCell<FileMgr>, logfile: &str) -> Result<Self> {
+    pub fn new(fm: Rc<RefCell<FileMgr>>, logfile: &str) -> Result<Self> {
         let currentblk;
         let logsize = fm.borrow().length(&logfile.to_string())?;
         let mut logpage = Page::new(fm.borrow().block_size());
@@ -31,7 +31,7 @@ impl LogMgr {
             fm.borrow_mut().read(&currentblk.borrow(), &mut logpage)?;
         }
         Ok(LogMgr {
-            fm: Rc::new(fm),
+            fm: fm,
             logfile: logfile.to_string(),
             logpage,
             currentblk: Rc::new(currentblk),
