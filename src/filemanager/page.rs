@@ -58,6 +58,9 @@ impl Page {
     pub fn set_bytes(&mut self, offset: usize, bytes: Vec<u8>) -> Result<()> {
         let length: usize = bytes.len();
 
+        println!("offset + 4 + length - 1: {}", offset + 4 + length - 1);
+        println!("len: {}", self.bb.len());
+
         if offset + 4 + length - 1 < self.bb.len() {
             self.set_i32(offset, length as i32)?;
             for i in 0..length {

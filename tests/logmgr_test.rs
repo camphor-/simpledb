@@ -3,6 +3,8 @@ use simpledb::{filemanager::file_mgr::FileMgr, memorymanager::log_manager::LogMg
 
 use std::cell::RefCell;
 use std::rc::Rc;
+use std::mem;
+use std::fs;
 
 extern crate simpledb;
 
@@ -13,6 +15,8 @@ pub fn log_mananger_test() {
 
     append_records(&mut lm, 1, 70);
     lm.flush(70).unwrap();
+
+    fs::remove_dir_all("testdata").unwrap();
 }
 
 fn append_records(lm: &mut LogMgr, start: i32, end: i32) {
@@ -23,8 +27,8 @@ fn append_records(lm: &mut LogMgr, start: i32, end: i32) {
 }
 
 fn create_record(s: String, n: i32) -> Vec<u8> {
-    let npos = Page::max_length(s.len());
-    let b = Vec::with_capacity(npos);
+    let npos = Page::max_length(s.bytes().len());
+    let b = vec![0; npos + mem::size_of::<i32>()];
     let mut p = Page::new(b);
     p.set_string(0, s).unwrap();
     p.set_i32(npos, n).unwrap();

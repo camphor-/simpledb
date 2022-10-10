@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Error, Result};
+use anyhow::{anyhow, Result};
 use std::collections::HashMap;
 use std::fs::{self, File, OpenOptions};
 use std::os::unix::prelude::FileExt;
@@ -71,7 +71,12 @@ impl FileMgr {
     }
 
     pub fn length(&self, filename: &String) -> Result<u64> {
-        Ok(fs::metadata(filename)?.len() as u64)
+        let filename = format!("{}/{}", self.db_directory, filename);
+        if Path::new(&filename).exists() {
+            return Ok(fs::metadata(filename)?.len() as u64);
+        }
+
+        Ok(0)
     }
 
     pub fn is_new(&self) -> bool {

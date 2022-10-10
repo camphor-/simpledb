@@ -3,7 +3,6 @@ extern crate simpledb;
 use simpledb::filemanager::block_id::BlockId;
 use simpledb::filemanager::file_mgr::FileMgr;
 use simpledb::filemanager::page::{New, Page};
-use simpledb::SimpleDB;
 use std::fs;
 
 #[test]

@@ -34,8 +34,8 @@ impl Buffer {
     }
 
     // TODO: &BlockId を返した方が良さそう
-    pub fn block(&self) -> &Option<BlockId> {
-        &self.block_id
+    pub fn block(&self) -> Option<&BlockId> {
+        self.block_id.as_ref()
     }
 
     pub fn is_pinned(&self) -> bool {

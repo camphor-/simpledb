@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Result};
 use std::thread;
 use std::time::{Duration, SystemTime};
-use std::{cell::RefCell, rc::Rc};
+use std::{cell::RefCell, cell::RefMut, rc::Rc};
 
 use super::super::filemanager::block_id::BlockId;
 use super::super::filemanager::file_mgr::FileMgr;
@@ -52,9 +52,9 @@ impl BufferMgr {
         }
     }
 
-    pub fn unpin(&mut self, buff: Rc<RefCell<Buffer>>) -> Result<()> {
-        buff.borrow_mut().unpin();
-        if buff.borrow().is_pinned() {
+    pub fn unpin(&mut self, mut buff: RefMut<Buffer>) -> Result<()> {
+        buff.unpin();
+        if buff.is_pinned() {
             self.num_available += 1;
         }
         Ok(())
