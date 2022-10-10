@@ -1,7 +1,6 @@
-use anyhow::{anyhow, Error, Result};
+use anyhow::{anyhow, Result};
 use std::collections::HashMap;
 use std::fs::{self, File, OpenOptions};
-use std::ops::Deref;
 use std::os::unix::prelude::FileExt;
 use std::path::Path;
 
@@ -51,7 +50,10 @@ impl FileMgr {
     pub fn write(&mut self, blk: &BlockId, p: &mut Page) -> Result<()> {
         let blocksize = self.block_size();
         let f = self.get_file(&blk.filename())?;
-        f.write_at(p.contents().as_slice(), blk.number() * blocksize as u64)?;
+        f.write_at(
+            p.contents().clone().as_slice(),
+            blk.number() * blocksize as u64,
+        )?;
         Ok(())
     }
 
@@ -69,11 +71,16 @@ impl FileMgr {
     }
 
     pub fn length(&self, filename: &String) -> Result<u64> {
-        Ok(fs::metadata(filename)?.len() as u64)
+        let filename = format!("{}/{}", self.db_directory, filename);
+        if Path::new(&filename).exists() {
+            return Ok(fs::metadata(filename)?.len() as u64);
+        }
+
+        Ok(0)
     }
 
     pub fn is_new(&self) -> bool {
-        self.is_new 
+        self.is_new
     }
 
     pub fn block_size(&self) -> usize {

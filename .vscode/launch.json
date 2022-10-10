@@ -11,14 +11,7 @@
             "cargo": {
                 "args": [
                     "test",
-                    "--no-run",
-                    "--lib",
-                    "--package=simpledb"
                 ],
-                "filter": {
-                    "name": "simpledb",
-                    "kind": "lib"
-                }
             },
             "args": [],
             "cwd": "${workspaceFolder}"

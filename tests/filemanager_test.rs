@@ -1,11 +1,14 @@
 extern crate simpledb;
 
-use simpledb::filemanager::block_id::{BlockId};
-use simpledb::filemanager::file_mgr::{FileMgr};
-use simpledb::filemanager::page::{Page, New};
+use simpledb::filemanager::block_id::BlockId;
+use simpledb::filemanager::file_mgr::FileMgr;
+use simpledb::filemanager::page::{New, Page};
+use std::fs;
 
 #[test]
 fn filenamager_test() {
+    // TODO: SimpleDB を使う
+
     let mut file_mgr = FileMgr::new("testdata", 1024).unwrap();
 
     let filename = "filemanager_test".to_string();
@@ -24,4 +27,6 @@ fn filenamager_test() {
 
     assert_eq!(p2.get_string(pos1).unwrap(), "abcdefghijklm".to_string());
     assert_eq!(p2.get_i32(pos2).unwrap(), 345);
+
+    fs::remove_dir_all("testdata").unwrap();
 }
